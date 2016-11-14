@@ -9,11 +9,10 @@ import tty
 import termios
 
 #mes modules
-import sous_marin
 import background
-import UI
 
-
+reglages_origine=termios.tcgetattr(sys.stdin)
+#termios.tcsetattr(sys.stdin, termios.TCSADRAIN, reglages_origine())
 def show():
     global submarine,background
     #affichage des different element
@@ -27,10 +26,35 @@ def clear():
     sys.stdout.write("\033[2J")
 
 def run():
-    for i in range( 10):
+    reload(sys) #changement encodage terminal
+    sys.setdefaultencoding('utf-8') 
+    #clear()
+    background.create(0)
+    tty.setraw(sys.stdin)
+    entree=sys.stdin.read(1)[0]
+    while entree != chr(27):
+	    if(entree=='Z' or entree=='z'):     #test des touches, on attend que l'utilisateur choisisse une touche
+	        y,x=background.getPosition()	#pour se déplacer
+		background.setPosition(y-1, x)
+            elif(entree=='S' or entree=='s'):
+	        y,x=background.getPosition()
+		background.setPosition(y+1, x)
+	    elif(entree=='Q' or entree=='q'):
+		y,x=background.getPosition()
+		background.setPosition(y,x-1)
+	    elif (entree=='D' or entree=='d'):
+		y,x=background.getPosition()
+		background.setPosition(y,x+1)
+	    #Mode affichage
+	    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, reglages_origine)
 	    clear()
 	    background.create(0)
-	    time.sleep(0.1)
+            #Mode saisie
+	    tty.setraw(sys.stdin)
+	    entree=sys.stdin.read(1)[0]
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, reglages_origine)
+		
+	
    
 
 run()

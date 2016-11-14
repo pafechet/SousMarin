@@ -6,14 +6,18 @@ import codecs
 #un background contient une chaine de caractere qui represente
 #une image de fond d ecran
 position=[5,5]
-def setPosition(y,x):
+
+#fonction pour changer la position
+def setPosition(y,x):   
 	global position
 	position=[y,x]
 
-def getPosition():
+#fonction pour avoir la position dans la liste 'position' y au rang 0 et x au rang 1
+def getPosition():		
 	return position[0], position[1]
 	
-
+#fonction qui permet d'écrire le sous marin dans le terminal
+#le sous marin est sur le fond
 def writeSubmarine(y,x, background ):
 
     y=y-3
@@ -24,8 +28,8 @@ def writeSubmarine(y,x, background ):
     '  |     ---------     |',
     '8-=\_________________/ ']
 
-    for j in range(len(sousmarin)):
-	for i in range(len(sousmarin[j])):
+    for j in range(len(sousmarin)): #longeur de la liste (ligne)
+	for i in range(len(sousmarin[j])):#longeur du nombre de caractères (colonnes)
 		background[y+j][x+i]=sousmarin[j][i]
     return background
 
@@ -40,17 +44,17 @@ def create(carte):
 	repertoire=os.path.dirname(os.path.abspath(__file__))
 	print repertoire
 	#on ouvre la carte
-	macarte = open ('carte.txt', 'r')
+	#macarte = open ('carte.txt', 'r')
 
-	string=macarte.read()
+	#string=macarte.read()
 
 	#separation des lignes
 	#la liste retournée est une liste
 	#unidimensionnelle, aka que des x pas de y
-	raw_ligne=string.splitlines()
+	#raw_ligne=string.splitlines()
 	j=0
 
-	f=codecs.open('carte.txt', 'r', "utf-8")
+	f=codecs.open(repertoire+'/carte.txt', 'r', "utf-8")
     	for line in f.readlines():
         	j+=1
         	i=0
@@ -68,7 +72,6 @@ def create(carte):
     	f.close()
 	
 	y,x=getPosition()
-	setPosition(y+1, x)
 	bg=writeSubmarine(y,x, bg)
 
 	affichage=''
@@ -81,10 +84,6 @@ def create(carte):
 
 	print affichage
 		
-
-
-
-	macarte.close
 
 	return bg
 
