@@ -8,14 +8,14 @@ import codecs
 position=[5,5]
 
 #fonction pour changer la position
-def setPosition(y,x):   
+def setPosition(y,x):
 	global position
 	position=[y,x]
 
 #fonction pour avoir la position dans la liste 'position' y au rang 0 et x au rang 1
-def getPosition():		
+def getPosition():
 	return position[0], position[1]
-	
+
 #fonction qui permet d'écrire le sous marin dans le terminal
 #le sous marin est sur le fond
 def writeSubmarine(y,x, background ):
@@ -42,7 +42,7 @@ def create(carte):
 	#creation du fond
 	#global bg
 	repertoire=os.path.dirname(os.path.abspath(__file__))
-	print repertoire
+	#print repertoire
 	#on ouvre la carte
 	#macarte = open ('carte.txt', 'r')
 
@@ -67,10 +67,10 @@ def create(carte):
         	        else:
 			    #print j,i
         	            bg[j][i]=ch.encode('utf-8')
-        	            i+=1          
+        	            i+=1
 
     	f.close()
-	
+
 	y,x=getPosition()
 	bg=writeSubmarine(y,x, bg)
 
@@ -83,17 +83,10 @@ def create(carte):
 		affichage=affichage+ligne
 
 	print affichage
-		
+
 
 	return bg
 
 def getChar(bg,x,y):
 	#renvoie le contenu d une case donnee
 	return (bg["map"][y-1][x-1])
-
-def show(bg):
-
-	#couleur fond
-	sys.stdout.write("\033[40m")
-	#couleur white
-	sys.stdout.write("\033[37m")
