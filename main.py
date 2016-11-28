@@ -14,13 +14,6 @@ import collision_environement
 
 reglages_origine=termios.tcgetattr(sys.stdin)
 #termios.tcsetattr(sys.stdin, termios.TCSADRAIN, reglages_origine())
-def show():
-    global submarine,background
-    #affichage des different element
-    background.show(background)
-
-	#afficher le sous_marin
-    #sous_marin.writeSubmarine(dissubmarine)
 
 def clear():
     sys.stdout.write("\033[1;1H")

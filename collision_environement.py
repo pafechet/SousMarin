@@ -55,7 +55,7 @@ def moveDown(y,x):
     #print a
     #print y,x
     obstacle=False
-    for i in range (x, x+22): #longeur du sous marin
+    for i in range (x, x+23): #longeur du sous marin
         print obstacle
         #print a[i][x-1]+'@'
         if a[y+2][i] in [' ','~']:
@@ -73,7 +73,7 @@ def moveUp(y,x):
     #print a
     #print y,x
     obstacle=False
-    for i in range (x, x+22): #longeur du sous marin
+    for i in range (x, x+23): #longeur du sous marin
           #print a[i][x-1]+'@'
         if a[y-4][i] in [' ','~']:
             pass
