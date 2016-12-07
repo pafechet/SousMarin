@@ -5,7 +5,7 @@ import codecs
 #le module background gere le type abstrait de donnee background
 #un background contient une chaine de caractere qui represente
 #une image de fond d ecran
-position=[5,]
+position=[5,5]
 
 #fonction pour changer la position
 def setPosition(y,x):
@@ -87,6 +87,6 @@ def create(carte):
 
 	return bg
 
-#def getChar(bg,x,y):
+def getChar(bg,x,y):
 	#renvoie le contenu d une case donnee
-#	return (bg["map"][y-1][x-1])
+	return (bg["map"][y-1][x-1])
