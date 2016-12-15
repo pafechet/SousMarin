@@ -3,13 +3,16 @@ import sys
 import os
 import codecs
 import json
+import entrees
 #le module background gere le type abstrait de donnee background
 #un background contient une chaine de caractere qui represente
 #une image de fond d ecran
 
 import collision_environement
+MAP_X=355
+MAP_Y=120
 
-position=[4 ,26]
+position=[4 ,61]
 repertoire=os.path.dirname(os.path.abspath(__file__))
 #fonction pour changer la position
 def setPosition(y,x):
@@ -57,11 +60,43 @@ def create(carte):
 	o2=collision_environement.getO2()
 
 	bg=[]
-	for j in range(120):
-		bg.append(['']*310)
+	for j in range(MAP_Y):
+		bg.append(['']*MAP_X)
 
 	j=0
 	file_path=repertoire+'/'+carte
+
+	f=codecs.open(file_path, 'r', encoding="utf-8")
+	for line in f.readlines():
+		j+=1
+		i=0
+		for ch in line:
+
+			if '\n' in ch:
+				bg[j][i]=' '
+			else:
+				#print j,i
+				bg[j][i]=ch.decode('utf-8')
+				i+=1
+	f.close()
+	y,x=getPosition()
+	bg=writeSubmarine(y,x, bg)
+	xmax=0
+	ymax=0
+	xmin=0
+	ymin=0
+
+	return bg
+
+
+def display_submap(map):
+
+	bg=[]
+	for j in range(MAP_Y):
+		bg.append(['']*MAP_X)
+
+	j=0
+	file_path=repertoire+'/'+map
 
 	f=codecs.open(file_path, 'r', encoding="utf-8")
 	for line in f.readlines():
@@ -76,42 +111,13 @@ def create(carte):
 				#print j,i
 				bg[j][i]=ch.decode('utf-8')
 				i+=1
-		bg.append(o2)
 	f.close()
-	y,x=getPosition()
-	#print y,x
-	bg=writeSubmarine(y,x, bg)
-	xmax=0
-	ymax=0
-	xmin=0
-	ymin=0
-
-	'''if(y<30):
-		ymax=30
-	elif(y<60):
-		ymax=60
-	elif(y<90):
-		ymax=90
-	else:
-		ymax=120
-
-	if(x<120):
-		xmax=120
-	elif(x<240):
-		xmax=240
-	else:
-		xmax=360'''
-
-
-
-
-	#display_map(x, ymax, bg)
-	return bg
-
+	render_map(bg)
 
 
 def display_map():
-	o2=collision_environement.getO2()
+	#collision_environement.oxygene()
+
 	y,x=getPosition()
 	bg=create('c.txt')
 	#print x,y
@@ -123,7 +129,7 @@ def display_map():
 	if(x-(x_term/2)<0):
 		xmin=0
 	else:
-		xmin=x-60
+		xmin=x-(60)
 
 	#print 'y-15: '+str(y-15)
 	if(y-(y_term/2)<0):
@@ -131,21 +137,50 @@ def display_map():
 	else:
 		ymin=y-15
 
+	render_map(bg, xmin, ymin, True)
 
-	#print ymin, xmin
+
+
+
+
+def render_map(bg, xmin=0, ymin=0, display_o2=False):
+	x_term=get_term_size()[0]
+	y_term=get_term_size()[1]
+
+	obj=entrees.get_text_objectif()
+	ymax=0
+	if(ymin+y_term<MAP_Y):
+		ymax=ymin+y_term
+	else:
+		ymax=MAP_Y
+
+	xmax=0
+	if(xmin+x_term<MAP_X):
+		xmax=xmin+x_term
+	else:
+		xmax=MAP_X
+
 	affichage=''
-	for j in range(ymin,ymin+y_term):
+	for j in range(ymin, ymax):
 		ligne=''
-		for i in range(xmin,xmin+x_term):
+		for i in range(xmin, xmax):
 		    ligne=ligne+bg[j][i]
 		ligne=ligne+'\n'
 		affichage=affichage+ligne
-	#print o
-	affichage=affichage+str(o2)
+
+
+	if(display_o2):
+		o2=collision_environement.getO2()
+		if(o2>=0):
+			line='Air: '+'❤  '*(o2/10)+'♡  '*(10-o2/10)
+			affichage=affichage+line+str(o2)+'\n'
+
+		#Affiche les vies
+		vies=collision_environement.getVies()
+		if(vies>=0):
+			line='Vies:'+'❤  '*(vies)+'♡  '*(10-vies)
+			affichage=affichage+line+str(vies)
+
+		affichage=affichage+'\nLEVEL '+str(entrees.get_objectif())+' :'+obj
+
 	print affichage
-
-
-
-#def getChar(bg,x,y):
-	#renvoie le contenu d une case donnee
-#	return (bg["map"][y-1][x-1])

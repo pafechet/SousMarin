@@ -14,10 +14,10 @@ import background
 #dans ce dossier nous allons traiter des colisions
 #il y aura l'environement
 
-life=1
 o2=100
+vies=10
 pression=0
-
+items_to_pass=[' ', '~']
 
 def getLife():
     return life
@@ -32,22 +32,26 @@ def getO2():
 def setO2(o):
     global o2
     o2=o
-'''
+
 def oxygene():
     o2=getO2()
     y,x=background.getPosition()
-    if y>5:
+    if y>4:
         setO2(o2-1)
-'''
+        if(o2<0):
+            if(o2%(-5)==0):
+                setVies(getVies()-1)
+
+    else:
+        setO2(100)
 
 
+def getVies():
+    return vies
 
-def getPression():
-    return pression
-
-def setPression(p):
-    global pression
-    pression=int(p)
+def setVies(o):
+    global vies
+    vies=o
 
 
 
@@ -59,7 +63,7 @@ def moveLeft(y,x, carte):
     for i in range (y-3, y+2): #hauteur du sous marin
         #print obstacle
         #print a[i][x-1]+'@'
-        if a[i][x-1] in [' ', '~']:
+        if (a[i][x-1] in items_to_pass) and (a[i][x-2] in items_to_pass):
             pass
         else: #(y,x, carte)!=' ':
             obstacle=True
@@ -67,7 +71,7 @@ def moveLeft(y,x, carte):
 
 def left(y,x, carte):
     if moveLeft(y,x, carte):
-        background.setPosition(y,x-1)
+        background.setPosition(y,x-2)
 
 def moveRight(y,x, carte):
     a=background.create(carte)
@@ -77,7 +81,7 @@ def moveRight(y,x, carte):
     for i in range (y-3, y+2): #hauteur du sous marin
         #print obstacle
         #print a[i][x-1]+'@'
-        if a[i][x+23] in [' ', '~']:
+        if a[i][x+23] in items_to_pass and (a[i][x+24] in items_to_pass):
             pass
         else: #(y,x, carte)!=' ':
             obstacle=True
@@ -85,7 +89,7 @@ def moveRight(y,x, carte):
 
 def right(y,x, carte):
     if moveRight(y,x, carte):
-        background.setPosition(y,x+1)
+        background.setPosition(y,x+2)
 
 def moveDown(y,x, carte):
     a=background.create(carte)
@@ -96,7 +100,7 @@ def moveDown(y,x, carte):
     for i in range (x, x+23): #longeur du sous marin
         #print obstacle
         #print a[i][x-1]+'@'
-        if a[y+2][i] in [' ','~']:
+        if a[y+2][i] in items_to_pass:
             pass
         else: #(y,x, carte)!=' ':
             obstacle=True
@@ -113,7 +117,8 @@ def moveUp(y,x, carte):
     obstacle=False
     for i in range (x, x+23): #longeur du sous marin
           #print a[i][x-1]+'@'
-        if a[y-4][i] in [' ','~']:
+        #print  a[y-4][i]
+        if a[y-4][i] in items_to_pass:
             pass
         else: #(y,x, carte)!=' ':
             obstacle=True
