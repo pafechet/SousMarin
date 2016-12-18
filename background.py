@@ -1,38 +1,31 @@
 # coding: utf-8
-import sys
-import os
-import codecs
-import json
+import sys, os, codecs, json, entrees
+
 #le module background gere le type abstrait de donnee background
 #un background contient une chaine de caractere qui represente
 #une image de fond d ecran
 
 import collision_environement
+MAP_X=355
+MAP_Y=120
 
-position=[4 ,26]
+position=[4,60]
 repertoire=os.path.dirname(os.path.abspath(__file__))
 #fonction pour changer la position
 def setPosition(y,x):
-	global position
-	position=[y,x]
+    global position
+    position=[y,x]
 
 
 def get_term_size():
-    data={}
-    with codecs.open(repertoire + '/taille_term.json', 'r', encoding='utf-8') as file_:
-        data = json.load(file_)
-    file_.close
+    y, x = os.popen('stty size', 'r').read().split()
+    x=int(x)-3
+    y=int(y)-3
+    return x,y
 
-    try:
-        if data['x'] and data ['y']:
-            return data['x'], data['y']
-        else:
-            return 140, 30
-    except KeyError:
-        return 140, 30
 #fonction pour avoir la position dans la liste 'position' y au rang 0 et x au rang 1
 def getPosition():
-	return position[0], position[1]
+    return position[0], position[1]
 
 #fonction qui permet d'écrire le sous marin dans le terminal
 #le sous marin est sur le fond
@@ -47,105 +40,132 @@ def writeSubmarine(y,x, background ):
     '8-=\_________________/ ']
 
     for j in range(len(sousmarin)): #longeur de la liste (ligne)
-	for i in range(len(sousmarin[j])):#longeur du nombre de caractères (colonnes)
-		background[y+j][x+i]=sousmarin[j][i]
+        for i in range(len(sousmarin[j])):#longeur du nombre de caractères (colonnes)
+            background[y+j][x+i]=sousmarin[j][i]
     return background
 
 
 
 def create(carte):
-	o2=collision_environement.getO2()
+    o2=collision_environement.getO2()
 
-	bg=[]
-	for j in range(120):
-		bg.append(['']*310)
+    bg=[]
+    for j in range(MAP_Y):
+        bg.append(['']*MAP_X)
 
-	j=0
-	file_path=repertoire+'/'+carte
+    j=0
+    file_path=repertoire+'/'+carte
 
-	f=codecs.open(file_path, 'r', encoding="utf-8")
-	for line in f.readlines():
-		#print line
-		j+=1
-		i=0
-		for ch in line:
+    f=codecs.open(file_path, 'r', encoding="utf-8")
+    for line in f.readlines():
+        j+=1
+        i=0
+        for ch in line:
 
-			if '\n' in ch:
-				bg[j][i]=' '
-			else:
-				#print j,i
-				bg[j][i]=ch.decode('utf-8')
-				i+=1
-		bg.append(o2)
-	f.close()
-	y,x=getPosition()
-	#print y,x
-	bg=writeSubmarine(y,x, bg)
-	xmax=0
-	ymax=0
-	xmin=0
-	ymin=0
+            if '\n' in ch:
+                bg[j][i]=' '
+            else:
+                bg[j][i]=ch.decode('utf-8')
+                i+=1
+    f.close()
+    y,x=getPosition()
+    bg=writeSubmarine(y,x, bg)
+    xmax=ymin=ymax=xmin=0
 
-	'''if(y<30):
-		ymax=30
-	elif(y<60):
-		ymax=60
-	elif(y<90):
-		ymax=90
-	else:
-		ymax=120
-
-	if(x<120):
-		xmax=120
-	elif(x<240):
-		xmax=240
-	else:
-		xmax=360'''
+    return bg
 
 
+def display_submap(map):
 
+    bg=[]
+    for j in range(MAP_Y):
+        bg.append(['']*MAP_X)
 
-	#display_map(x, ymax, bg)
-	return bg
+    j=0
+    file_path=repertoire+'/'+map
 
+    f=codecs.open(file_path, 'r', encoding="utf-8")
+    for line in f.readlines():
+        #print line
+        j+=1
+        i=0
+        for ch in line:
+
+            if '\n' in ch:
+                bg[j][i]=' '
+            else:
+                #print j,i
+                bg[j][i]=ch.decode('utf-8')
+                i+=1
+    f.close()
+    render_map(bg)
 
 
 def display_map():
-	o2=collision_environement.getO2()
-	y,x=getPosition()
-	bg=create('c.txt')
-	#print x,y
-	x_term=get_term_size()[0]
-	y_term=get_term_size()[1]
-	ymin=0
-	xmin=0
 
-	if(x-(x_term/2)<0):
-		xmin=0
-	else:
-		xmin=x-60
+    y,x=getPosition()
+    bg=create('c.txt')
+    x_term=get_term_size()[0]
+    y_term=get_term_size()[1]
 
-	#print 'y-15: '+str(y-15)
-	if(y-(y_term/2)<0):
-		ymin=0
-	else:
-		ymin=y-15
+    ymin=xmin=0
 
+    if(x-(x_term/2)<0):
+            xmin=0
+    elif(x+x_term>=len(bg[0])):
+            xmin=len(bg[0])-x_term
+    else:
+            xmin=x-(60)
 
-	#print ymin, xmin
-	affichage=''
-	for j in range(ymin,ymin+y_term):
-		ligne=''
-		for i in range(xmin,xmin+x_term):
-		    ligne=ligne+bg[j][i]
-		ligne=ligne+'\n'
-		affichage=affichage+ligne
-	#print o
-	affichage=affichage+str(o2)
-	print affichage
+    if(y-(y_term/2)<0):
+            ymin=0
+    elif(y+y_term>=len(bg)):
+            ymin=len(bg)-y_term-15
+    else:
+            ymin=y-15
+    render_map(bg, xmin, ymin, True)
 
 
 
-#def getChar(bg,x,y):
-	#renvoie le contenu d une case donnee
-#	return (bg["map"][y-1][x-1])
+def render_map(bg, xmin=0, ymin=0, display_o2=False):
+    size=get_term_size()
+    x_term=size[0]
+    y_term=size[1]
+
+    obj=entrees.get_text_objectif()
+    ymax=0
+    if(ymin+y_term<MAP_Y):
+        ymax=ymin+y_term
+    else:
+        ymax=MAP_Y
+
+    xmax=0
+    if(xmin+x_term<MAP_X):
+        xmax=xmin+x_term
+    else:
+        xmax=MAP_X
+
+    affichage=''
+    for j in range(ymin, ymax):
+        ligne=''
+        for i in range(xmin, xmax):
+            ligne=ligne+bg[j][i]
+        ligne=ligne+'\n'
+        affichage=affichage+ligne
+
+
+    if(display_o2):
+        o2=collision_environement.getO2()
+        if(o2>=0):
+            line='Air: '+'❤  '*(o2/10)+'♡  '*(10-o2/10)
+            affichage=affichage+line+str(o2)+'\n'
+
+        #Affiche les vies
+        vies=collision_environement.getVies()
+        if(vies>=0):
+            line='Vies:'+'❤  '*(vies)+'♡  '*(10-vies)
+            affichage=affichage+line+str(vies)
+
+        affichage=affichage+'\nLEVEL '+str(entrees.get_objectif())+' :'+obj
+
+    print affichage
